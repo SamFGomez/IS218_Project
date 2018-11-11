@@ -1,4 +1,7 @@
 <?php
+session_start();
+include("account.php");
+
 $firstName=$_GET['firstName'];
 $lastName=$_GET['lastName'];
 $birthday=$_GET['birthday'];
@@ -37,11 +40,19 @@ if(strlen($password)<8){
 }
 
 if($validRegistration){
+  
+  $db = mysqli_connect($hostname, $username, $mysqlpw, $project) or die("Unable to connect to DB");
+  mysqli_select_db($db, "sfg4");
+  $s = "INSERT INTO Users values('$firstName', '$lastName', '$email', '$birthday', '$password')";  
+  $t = mysqli_query($db, $s) or die("Bad Query Check DB");
+  
   echo "First name: $firstName<br/>";
   echo "Last name : $lastName<br/>";
   echo "Birthday  : $birthday<br/>";
   echo "Email     : $email<br/>";
   echo "Password  : $password<br/>";
+  $_SESSION['email'] = $email;
+  header("Location: homepage.php");
 } 
 
 

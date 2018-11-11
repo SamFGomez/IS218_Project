@@ -1,4 +1,8 @@
 <?php
+  session_start();
+  $email = $_SESSION["email"];
+  
+  include("account.php");
 	$questionName=$_GET['qName'];
 	$questionBody=$_GET['qBody'];
 	$questionSkills=$_GET['qSkills'];
@@ -25,6 +29,12 @@
 	}
  
   if($questionValid){
+    
+      $db = mysqli_connect($hostname, $username, $mysqlpw, $project) or die("Unable to connect to DB");
+      mysqli_select_db($db, "sfg4");
+      $s = "INSERT INTO Questions(email,name,body,skills) values('$email','$questionName', '$questionBody', '$questionSkills')";  
+      $t = mysqli_query($db, $s) or die("Bad Query");
+    
     echo "Question Name: $questionName</br>";
     echo "Question Body: $questionBody</br>";
     echo "Skill List: </br>";
@@ -33,4 +43,5 @@
     }
   } 
 
+  header("Location: homepage.php");
 ?>
