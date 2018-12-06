@@ -1,46 +1,21 @@
-<?php
-session_start();
-include("account.php");
-$email = $_GET['email'];
-$password = $_GET['password'];
+<?php include('header.php'); ?>
 
-$loginValid = true;
+<h1 class="mt-5"><center>LogIn</center></h1>
 
-if(empty($email)){
-  echo "Please enter an email.<br/>";
-  $loginValid = false;
-}
-if(strpos($email,'@')== false){
-  echo "ERROR: Invalid Email<br/>";
-  $loginValid = false;
-}
-if(empty($password)){
-  echo "Please enter an password.<br/>";
-  $loginValid = false;
-}
-if(strlen($password)<8){
-  echo "ERROR: Password is too short.<br/>";
-  $loginValid = false;
-}
+<div class="container">
+<form action="index.php" method="get">
+  <input type="hidden" name="action" value="login">
+  <div class="form-group">
+	Email: <input class="form-control" type="text" name="email" id="email">
+	<br>
+	Password: <input class="form-control" type="text" name="password" id="password">
+	<br>
+	 <center><input class="btn btn-dark" type='submit'></center>
+ </div>
 
-if($loginValid){  
-  $db = mysqli_connect($hostname, $username, $mysqlpw, $project) or die("Unable to connect to DB");
-  mysqli_select_db($db, "sfg4");
-  $s = "SELECT * FROM Users WHERE email='$email' AND password='$password'";  
-  $t = mysqli_query($db, $s) or die("Bad Query");
-  
-  $confirmation = mysqli_num_rows($t);
-  
-  if($confirmation==1){
-    $_SESSION['email'] = $email;
-    header("Location: homepage.php");
-  } else {
-    header("Location: index.html");
-  }
-  
-  echo "Email: $email<br/>";
-  echo "Password: $password<br/>";
-  
-}
+</form>
+</div>
+<br>
+<center><a class="text-dark" href="index.php?action=display_registration"> Create Account </a></center>
 
-?>
+<?php include('footer.php'); ?>
