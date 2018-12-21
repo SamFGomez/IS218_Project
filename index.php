@@ -2,11 +2,12 @@
 session_start();
 require('accounts_db.php');
 require('questions_db.php');
+require('answers_db.php');
 
 $action = $_GET['action'];
 switch($action){
   case "display_login":
-    include('Location: login.php');
+    include('login.php');
     break;
     
   case "login":
@@ -16,10 +17,16 @@ switch($action){
     if($confirmation==1){
       $_SESSION['fullName'] = getFullName($email);
       $_SESSION['email'] = $email;
+      $_SESSION['view'] = 'user';
       header("Location: .?action=display_questions");
     } else {
       header("Location: login.php");
     }
+    break;
+    
+  case "logout":
+    session_destroy();
+    header("Location: .?action=display_login");
     break;
     
   case "display_registration":
@@ -72,9 +79,16 @@ switch($action){
     break;
     
   case "display_questions":
-    $_SESSION['userQuestions'] = displayQuestions($_SESSION['email']);
+    $_SESSION['view'] = 'User';
+    $_SESSION['questions'] = displayQuestions($_SESSION['email']);
     include('homepage.php');
-    break;
+    break; 
+  
+  case "display_all_questions":
+    $_SESSION['view'] = 'All';
+    $_SESSION['questions'] = displayAllQuestions();
+    include('homepage.php');
+    break;  
   
   case "display_new_question":
     include('qform.php');
@@ -110,9 +124,61 @@ switch($action){
   case "delete_question":
     $qid = $_GET['qid'];
     delQuestion($qid);
-    header("Location: .?action=display_questions");
+    $view = $_SESSION['view'];
+    switch ($view){
+      case "User":
+        header("Location: .?action=display_questions");
+      break;
+      case "All":
+        header("Location: .?action=display_all_questions");
+      break;
+    }
     break;
     
+  case "toggle_view":
+    $view = $_SESSION['view'];
+    switch ($view){
+      case "All":
+        header("Location: .?action=display_questions");
+      break;
+      case "User":
+        header("Location: .?action=display_all_questions");
+      break;
+    }
+  break;
+  
+  case "display_view_question":
+    $qid = $_GET['qid'];
+    $qEmail = $_GET['email'];
+    $userQ = 'false';
+    if($qEmail == $_SESSION['email']){
+      $userQ = 'true';
+    }
+    $_SESSION['questions'] = displayQuestionInfo($qid);
+    $_SESSION['answers'] = displayAnswers($qid);
+    echo $_SESSION['questions'];
+    header("Location: QuestionView.php?qid=$qid&userQ=$userQ");
+  break;
+  
+  case "submit_answer":
+    $qid = $_GET['qid'];
+    $answer = $_GET['answer'];
+    $email = $_SESSION['email'];
+    addAnswer($qid,$answer,$email);
+    header("Location: .?action=display_view_question");
+    break;
+  
+  case "change_vote":
+    $aid = $_GET['aid'];
+    $qid = $_GET['qid'];
+    $vote = $_GET['vote'];
+    changeVote($aid,$vote);
+    header("Location: .?action=display_view_question");
+  break;
+  
+  
+  
+  
 }
   
 ?>
